@@ -22,7 +22,11 @@ function normalizeCollection(payload) {
   return []
 }
 
-function Workouts({ apiBaseUrl }) {
+function Workouts() {
+  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
+  const endpoint = codespaceName
+    ? `https://${codespaceName}-8000.app.github.dev/api/workouts/`
+    : 'http://localhost:8000/api/workouts/'
   const [workouts, setWorkouts] = useState([])
   const [pagination, setPagination] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -36,7 +40,7 @@ function Workouts({ apiBaseUrl }) {
         setIsLoading(true)
         setError('')
 
-        const response = await fetch(`${apiBaseUrl}/workouts/`, {
+        const response = await fetch(endpoint, {
           signal: abortController.signal,
         })
 
@@ -70,13 +74,13 @@ function Workouts({ apiBaseUrl }) {
     return () => {
       abortController.abort()
     }
-  }, [apiBaseUrl])
+  }, [endpoint])
 
   return (
     <section className="card shadow-sm border-0">
       <div className="card-body p-4">
         <h2 className="h4">Workouts</h2>
-        <p className="text-body-secondary mb-3">Source: {`${apiBaseUrl}/workouts/`}</p>
+        <p className="text-body-secondary mb-3">Source: {endpoint}</p>
 
         {isLoading && <p className="mb-0">Loading workouts...</p>}
         {error && <p className="text-danger mb-0">{error}</p>}

@@ -22,7 +22,11 @@ function normalizeCollection(payload) {
   return []
 }
 
-function Teams({ apiBaseUrl }) {
+function Teams() {
+  const codespaceName = import.meta.env.VITE_CODESPACE_NAME?.trim()
+  const endpoint = codespaceName
+    ? `https://${codespaceName}-8000.app.github.dev/api/teams/`
+    : 'http://localhost:8000/api/teams/'
   const [teams, setTeams] = useState([])
   const [pagination, setPagination] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -36,7 +40,7 @@ function Teams({ apiBaseUrl }) {
         setIsLoading(true)
         setError('')
 
-        const response = await fetch(`${apiBaseUrl}/teams/`, {
+        const response = await fetch(endpoint, {
           signal: abortController.signal,
         })
 
@@ -70,13 +74,13 @@ function Teams({ apiBaseUrl }) {
     return () => {
       abortController.abort()
     }
-  }, [apiBaseUrl])
+  }, [endpoint])
 
   return (
     <section className="card shadow-sm border-0">
       <div className="card-body p-4">
         <h2 className="h4">Teams</h2>
-        <p className="text-body-secondary mb-3">Source: {`${apiBaseUrl}/teams/`}</p>
+        <p className="text-body-secondary mb-3">Source: {endpoint}</p>
 
         {isLoading && <p className="mb-0">Loading teams...</p>}
         {error && <p className="text-danger mb-0">{error}</p>}
